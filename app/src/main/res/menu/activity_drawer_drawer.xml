@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_events_list"
+            android:icon="@drawable/ic_events_list"
+            android:title="События" />
+        <item
+            android:id="@+id/nav_calendar"
+            android:icon="@drawable/ic_calendar"
+            android:title="Календарь" />
+        <item
+            android:id="@+id/nav_map"
+            android:icon="@drawable/ic_menu_map"
+            android:title="Карта" />
+    </group>
+
+    <item android:title="Служебные">
+        <menu>
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_settings"
+                android:title="Настройки" />
+            <item
+                android:id="@+id/nav_about"
+                android:icon="@drawable/ic_info_outline"
+                android:title="О приложении" />
+        </menu>
+    </item>
+
+</menu>
