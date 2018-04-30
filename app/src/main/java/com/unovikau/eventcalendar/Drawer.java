@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.content.Intent;
 
+import com.unovikau.eventcalendar.fragments.CalendarFragment;
 import com.unovikau.eventcalendar.fragments.EventListFragment;
 import com.unovikau.eventcalendar.fragments.GMapFragment;
 
@@ -80,7 +81,7 @@ public class Drawer extends AppCompatActivity
         if (id == R.id.nav_events_list) {
             fragmentManager.beginTransaction().replace(R.id.content_frame, new EventListFragment()).commit();
         } else if (id == R.id.nav_calendar) {
-
+            fragmentManager.beginTransaction().replace(R.id.content_frame, new CalendarFragment()).commit();
         } else if (id == R.id.nav_map) {
             fragmentManager.beginTransaction().replace(R.id.content_frame, new GMapFragment()).commit();
         } else if (id == R.id.nav_settings) {
@@ -88,7 +89,6 @@ public class Drawer extends AppCompatActivity
         } else if (id == R.id.nav_about) {
 
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

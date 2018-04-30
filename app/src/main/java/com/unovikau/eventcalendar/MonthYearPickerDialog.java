@@ -19,10 +19,19 @@ public class MonthYearPickerDialog extends DialogFragment{
     private static final int MAX_YEAR = 2021;
     private static final int MIN_YEAR = 2017;
     private DatePickerDialog.OnDateSetListener listener;
+    private int year;
+    private int month;
+
 
     public void setListener(DatePickerDialog.OnDateSetListener listener) {
         this.listener = listener;
     }
+
+    public void setMonth(int month, int year){
+        this.month = month;
+        this.year = year;
+    }
+
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -30,21 +39,18 @@ public class MonthYearPickerDialog extends DialogFragment{
         // Get the layout inflater
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        Calendar cal = Calendar.getInstance();
-
         View dialog = inflater.inflate(R.layout.date_picker_dialog, null);
         final NumberPicker monthPicker = (NumberPicker) dialog.findViewById(R.id.picker_month);
         final NumberPicker yearPicker = (NumberPicker) dialog.findViewById(R.id.picker_year);
 
-        monthPicker.setMinValue(1);
-        monthPicker.setMaxValue(12);
-        monthPicker.setValue(cal.get(Calendar.MONTH) + 1);
+        monthPicker.setMinValue(0);
+        monthPicker.setMaxValue(11);
+        monthPicker.setValue(this.month);
         monthPicker.setDisplayedValues(  getResources().getStringArray(R.array.months_ru));
 
-        int year = cal.get(Calendar.YEAR);
         yearPicker.setMinValue(MIN_YEAR);
         yearPicker.setMaxValue(MAX_YEAR);
-        yearPicker.setValue(year);
+        yearPicker.setValue(this.year);
 
         builder.setView(dialog)
                 // Add action buttons

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "172456291734",
+    "firebase_url": "https://event-calendar-1521982961124.firebaseio.com",
+    "project_id": "event-calendar-1521982961124",
+    "storage_bucket": "event-calendar-1521982961124.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:172456291734:android:73cac523bbff2c6c",
+        "android_client_info": {
+          "package_name": "com.unovikau.eventcalendar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "172456291734-gadao8r9pdsa648dqb2kl9585ha25723.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.unovikau.eventcalendar",
+            "certificate_hash": "325bfecbcdc560547b6c10d8e831d67ca96f9287"
+          }
+        },
+        {
+          "client_id": "172456291734-5h3voaifefv06gee069904r9tl5jr583.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKhOuxVa8eGnBDxj9_Zu2Dg4rOsf30E_o"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "172456291734-5h3voaifefv06gee069904r9tl5jr583.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
