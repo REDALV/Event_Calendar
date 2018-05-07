@@ -59,6 +59,8 @@ public class EventListFragment extends Fragment {
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("events");
+        myRef.keepSynced(true);
+
         eventList = new ArrayList<>();
 
 
@@ -93,7 +95,7 @@ public class EventListFragment extends Fragment {
                         bundle.putString("event", json);
                         eventDetailsFragment.setArguments(bundle);
 
-                        fragmentManager.beginTransaction().replace(R.id.content_frame, eventDetailsFragment).commit();
+                        fragmentManager.beginTransaction().replace(R.id.content_frame, eventDetailsFragment).addToBackStack("event_details").commit();
                     }
                 });
 

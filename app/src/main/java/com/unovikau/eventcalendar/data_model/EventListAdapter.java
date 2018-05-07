@@ -3,7 +3,9 @@ package com.unovikau.eventcalendar.data_model;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +30,7 @@ public class EventListAdapter extends ArrayAdapter<Event> implements View.OnClic
 
     // View lookup cache
     private static class ViewHolder {
+        ImageView event_type_item;
         TextView txtName;
         TextView txtDate;
         ImageView show_on_map;
@@ -64,7 +67,7 @@ public class EventListAdapter extends ArrayAdapter<Event> implements View.OnClic
                 bundle.putString("event", json);
                 gMapFragment.setArguments(bundle);
 
-                fragmentManager.beginTransaction().replace(R.id.content_frame, gMapFragment).commit();
+                fragmentManager.beginTransaction().add(R.id.content_frame, gMapFragment).addToBackStack("google_map_item").commit();
                 break;
             }
         }
@@ -86,6 +89,7 @@ public class EventListAdapter extends ArrayAdapter<Event> implements View.OnClic
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.row_event_item, parent, false);
+            viewHolder.event_type_item = (ImageView) convertView.findViewById(R.id.event_type_item);
             viewHolder.txtName = (TextView) convertView.findViewById(R.id.name_item);
             viewHolder.txtDate = (TextView) convertView.findViewById(R.id.date_item);
             viewHolder.show_on_map = (ImageView) convertView.findViewById(R.id.show_event_on_map);
@@ -102,6 +106,27 @@ public class EventListAdapter extends ArrayAdapter<Event> implements View.OnClic
         result.startAnimation(animation);
         lastPosition = position;
 
+        Drawable typeIcon;
+        switch(dataModel.getType().intValue()){
+            case 1:{
+                typeIcon = ResourcesCompat.getDrawable(mContext.getResources(), R.drawable.ic_football, null);
+                break;
+            }
+            case 2:{
+                typeIcon = ResourcesCompat.getDrawable(mContext.getResources(), R.drawable.ic_lyre, null);
+                break;
+            }
+            case 3:{
+                typeIcon = ResourcesCompat.getDrawable(mContext.getResources(), R.drawable.ic_open_book, null);
+                break;
+            }
+            default:{
+                typeIcon = ResourcesCompat.getDrawable(mContext.getResources(), R.drawable.ic_menu_slideshow, null);
+                break;
+            }
+
+        }
+        viewHolder.event_type_item.setImageDrawable(typeIcon);
         viewHolder.txtName.setText(dataModel.getName());
         viewHolder.txtDate.setText(dataModel.getDateString());
         viewHolder.show_on_map.setOnClickListener(this);

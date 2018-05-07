@@ -82,11 +82,11 @@ public class Drawer extends AppCompatActivity
         FragmentManager fragmentManager = getFragmentManager();
 
         if (id == R.id.nav_events_list) {
-            fragmentManager.beginTransaction().replace(R.id.content_frame, new EventListFragment()).commit();
+            fragmentManager.beginTransaction().replace(R.id.content_frame, new EventListFragment()).addToBackStack("event_list").commit();
         } else if (id == R.id.nav_calendar) {
-            fragmentManager.beginTransaction().replace(R.id.content_frame, new CalendarFragment()).commit();
+            fragmentManager.beginTransaction().replace(R.id.content_frame, new CalendarFragment()).addToBackStack("calendar").commit();
         } else if (id == R.id.nav_map) {
-            fragmentManager.beginTransaction().replace(R.id.content_frame, new GMapFragment()).commit();
+            fragmentManager.beginTransaction().replace(R.id.content_frame, new GMapFragment()).addToBackStack("google_map").commit();
         } else if (id == R.id.nav_settings) {
 
         } else if (id == R.id.nav_about) {

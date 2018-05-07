@@ -4,12 +4,22 @@
     android:orientation="vertical"
     android:padding="10dp">
 
+    <ImageView
+        android:id="@+id/event_type_item"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:padding="10dp"
+        android:layout_centerVertical="true" />
+
     <TextView
         android:id="@+id/name_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/show_event_on_map"
+        android:layout_toRightOf="@+id/event_type_item"
         android:text="Name"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@android:color/black" />
@@ -21,6 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/name_item"
         android:layout_marginTop="5dp"
+        android:layout_toRightOf="@+id/event_type_item"
         android:text="Date"
         android:textColor="@android:color/black" />
 

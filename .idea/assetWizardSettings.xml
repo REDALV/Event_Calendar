@@ -33,12 +33,13 @@
                         </option>
                         <option name="values">
                           <map>
+                            <entry key="assetSourceType" value="FILE" />
                             <entry key="color" value="ff341d" />
-                            <entry key="height" value="30" />
-                            <entry key="outputName" value="ic_map_marker" />
+                            <entry key="height" value="32" />
+                            <entry key="outputName" value="ic_lyre" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="C:\Users\Владислав" />
-                            <entry key="width" value="30" />
+                            <entry key="sourceFile" value="F:\Download\lyre.svg" />
+                            <entry key="width" value="32" />
                           </map>
                         </option>
                       </PersistentState>
