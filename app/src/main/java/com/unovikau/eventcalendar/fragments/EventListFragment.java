@@ -43,6 +43,7 @@ public class EventListFragment extends Fragment {
 
     int year;
     int month;
+    String selectedDate;
 
     TextView current_month_tv;
 
@@ -50,12 +51,38 @@ public class EventListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(getArguments() != null){
+            this.selectedDate = getArguments().getString("selected_date");
+        }
+        else
+            this.selectedDate = null;
         return inflater.inflate(R.layout.fragment_event_list, container, false);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        current_month_tv = (TextView) getView().findViewById(R.id.current_month);
+
+        months = getResources().getStringArray(R.array.months_ru);
+        Calendar cal = Calendar.getInstance();
+        year = cal.get(Calendar.YEAR);
+        month = cal.get(Calendar.MONTH);
+
+        if(this.selectedDate == null){
+            /*
+            // Set current month and year
+            months = getResources().getStringArray(R.array.months_ru);
+            Calendar cal = Calendar.getInstance();
+            year = cal.get(Calendar.YEAR);
+            month = cal.get(Calendar.MONTH);*/
+            current_month_tv.setText(months[month] + " " + year);
+        }
+        else {
+            String[] date = this.selectedDate.split(".");
+            current_month_tv.setText(this.selectedDate);
+        }
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("events");
@@ -78,7 +105,13 @@ public class EventListFragment extends Fragment {
                 }
 
                 adapter = new EventListAdapter(eventList,getActivity());
-                listView= getView().findViewById(R.id.event_list_view);
+                
+                if(selectedDate == null)
+                    adapter.getFilter().filter(String.valueOf(month + 1) + "." + String.valueOf(year));
+                else
+                    adapter.getFilter().filter(selectedDate);
+
+                listView = getView().findViewById(R.id.event_list_view);
                 listView.setAdapter(adapter);
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
@@ -99,6 +132,7 @@ public class EventListFragment extends Fragment {
                     }
                 });
 
+
             }
 
             @Override
@@ -108,14 +142,7 @@ public class EventListFragment extends Fragment {
             }
         });
 
-        current_month_tv = (TextView) getView().findViewById(R.id.current_month);
 
-        // Set current month and year
-        months = getResources().getStringArray(R.array.months_ru);
-        Calendar cal = Calendar.getInstance();
-        year = cal.get(Calendar.YEAR);
-        month = cal.get(Calendar.MONTH);
-        current_month_tv.setText(months[month] + " " + year);
 
 
         // Selection month listener
@@ -131,6 +158,7 @@ public class EventListFragment extends Fragment {
                         year = selected_year;
                         month = selected_month;
                         current_month_tv.setText(months[selected_month] + " " + selected_year);
+                        adapter.getFilter().filter(String.valueOf(month + 1) + "." + String.valueOf(year));
                     }
                 });
                 pd.show(getFragmentManager(), "MonthYearPickerDialog");

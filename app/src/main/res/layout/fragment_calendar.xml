@@ -7,15 +7,15 @@
     android:orientation="vertical">
 
     <CalendarView
-        android:id="@+id/calendarView"
+        android:id="@+id/calendar_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/select_date_button"
         android:layout_width="226dp"
         android:layout_height="wrap_content"
-        android:text="OK"
+        android:text="Выбрать дату"
         android:textSize="18sp" />
 
 </LinearLayout>

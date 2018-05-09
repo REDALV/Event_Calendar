@@ -11,6 +11,14 @@
         android:textAlignment="center"
         android:textSize="30sp" />
 
+    <TextView
+        android:id="@+id/no_events_on_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textSize="15sp" />
+
+
     <ListView
         android:id="@+id/event_list_view"
         android:layout_width="match_parent"

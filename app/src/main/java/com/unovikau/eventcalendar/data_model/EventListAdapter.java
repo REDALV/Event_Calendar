@@ -13,6 +13,9 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,9 +27,12 @@ import com.unovikau.eventcalendar.fragments.GMapFragment;
 
 import java.util.ArrayList;
 
-public class EventListAdapter extends ArrayAdapter<Event> implements View.OnClickListener{
+public class EventListAdapter extends BaseAdapter implements View.OnClickListener, Filterable{
     private ArrayList<Event> dataSet;
+    DateFilter filter;
     Context mContext;
+    private ArrayList<Event> filterList;
+
 
     // View lookup cache
     private static class ViewHolder {
@@ -37,8 +43,9 @@ public class EventListAdapter extends ArrayAdapter<Event> implements View.OnClic
     }
 
     public EventListAdapter(ArrayList<Event> data, Context context) {
-        super(context, R.layout.row_event_item, data);
+        //super(context, R.layout.row_event_item, data);
         this.dataSet = data;
+        this.filterList = data;
         this.mContext=context;
     }
 
@@ -67,7 +74,7 @@ public class EventListAdapter extends ArrayAdapter<Event> implements View.OnClic
                 bundle.putString("event", json);
                 gMapFragment.setArguments(bundle);
 
-                fragmentManager.beginTransaction().add(R.id.content_frame, gMapFragment).addToBackStack("google_map_item").commit();
+                fragmentManager.beginTransaction().replace(R.id.content_frame, gMapFragment).addToBackStack("google_map_item").commit();
                 break;
             }
         }
@@ -76,9 +83,24 @@ public class EventListAdapter extends ArrayAdapter<Event> implements View.OnClic
     private int lastPosition = -1;
 
     @Override
+    public int getCount() {
+        return dataSet.size();
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return dataSet.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return dataSet.indexOf(getItem(position));
+    }
+
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
-        Event dataModel = getItem(position);
+        Event dataModel = (Event)getItem(position);
         // Check if an existing view is being reused, otherwise inflate the view
         ViewHolder viewHolder; // view lookup cache stored in tag
 
@@ -87,7 +109,7 @@ public class EventListAdapter extends ArrayAdapter<Event> implements View.OnClic
         if (convertView == null) {
 
             viewHolder = new ViewHolder();
-            LayoutInflater inflater = LayoutInflater.from(getContext());
+            LayoutInflater inflater = LayoutInflater.from(mContext);
             convertView = inflater.inflate(R.layout.row_event_item, parent, false);
             viewHolder.event_type_item = (ImageView) convertView.findViewById(R.id.event_type_item);
             viewHolder.txtName = (TextView) convertView.findViewById(R.id.name_item);
@@ -133,6 +155,67 @@ public class EventListAdapter extends ArrayAdapter<Event> implements View.OnClic
         viewHolder.show_on_map.setTag(position);
         // Return the completed view to render on screen
         return convertView;
+    }
+
+    @Override
+    public Filter getFilter() {
+        // TODO Auto-generated method stub
+        if(filter == null)
+        {
+            filter=new DateFilter();
+        }
+
+        return filter;
+    }
+
+
+    class DateFilter extends Filter
+    {
+
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            // TODO Auto-generated method stub
+
+            FilterResults results=new FilterResults();
+
+            if(constraint != null && constraint.length()>0)
+            {
+                //CONSTARINT TO UPPER
+                constraint=constraint.toString().toUpperCase();
+
+                ArrayList<Event> filters=new ArrayList<Event>();
+
+                //get specific items
+                for(int i=0;i<filterList.size();i++)
+                {
+                    String curDate = filterList.get(i).getDateString();
+                    if(curDate.contains(constraint))
+                    {
+                        filters.add(filterList.get(i));
+                    }
+                }
+
+                results.count=filters.size();
+                results.values=filters;
+
+            }else
+            {
+                results.count=filterList.size();
+                results.values=filterList;
+
+            }
+
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            // TODO Auto-generated method stub
+
+            dataSet=(ArrayList<Event>) results.values;
+            notifyDataSetChanged();
+        }
+
     }
 
 }

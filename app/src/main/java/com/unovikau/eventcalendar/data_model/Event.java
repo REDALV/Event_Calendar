@@ -3,11 +3,8 @@ package com.unovikau.eventcalendar.data_model;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Locale;
 
 @IgnoreExtraProperties
 public class Event {
@@ -16,10 +13,12 @@ public class Event {
     private String article;
     private String address;
     private GregorianCalendar date;
-    private Boolean is_important;
+    private GregorianCalendar dateEnd;
+    private Boolean isImportant;
     private Double lat;
     private Double lng;
     private Long type;
+    private Long subtype;
     private List<String> images;
 
 
@@ -29,18 +28,24 @@ public class Event {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Event(String name, String article, String address, String date, Boolean is_important, Double lat, Double lng, Long type, List<String> images) {
+    public Event(String name, String article, String address, String date, String dateEnd, Boolean isImportant, Double lat, Double lng, Long type, Long subtype, List<String> images) {
         String[] array = date.split(".");
-
         this.date = new GregorianCalendar(Integer.parseInt(array[2]), Integer.parseInt(array[1])-1, Integer.parseInt(array[0]));
+
+        array = dateEnd.split(".");
+        if (array.length == 3)
+            this.dateEnd = new GregorianCalendar(Integer.parseInt(array[2]), Integer.parseInt(array[1])-1, Integer.parseInt(array[0]));
+        else
+            this.dateEnd = null;
 
         this.name = name;
         this.article = article;
         this.address = address;
-        this.is_important = is_important;
+        this.isImportant = isImportant;
         this.lat = lat;
         this.lng = lng;
         this.type = type;
+        this.subtype = subtype;
         this.images = images;
     }
 
@@ -82,12 +87,32 @@ public class Event {
         this.date = new GregorianCalendar(Integer.parseInt(array[2]), Integer.parseInt(array[1])-1, Integer.parseInt(array[0]));
     }
 
-    public Boolean getIs_important() {
-        return is_important;
+    public GregorianCalendar getDateEnd() {
+        return dateEnd;
     }
 
-    public void setIs_important(Boolean is_important) {
-        this.is_important = is_important;
+    public void setDateEnd(String dateEnd) {
+        String[] array = dateEnd.split("\\.");
+        if(array.length == 3)
+            this.dateEnd = new GregorianCalendar(Integer.parseInt(array[2]), Integer.parseInt(array[1])-1, Integer.parseInt(array[0]));
+        else
+            this.dateEnd = null;
+    }
+
+    public Long getSubtype() {
+        return subtype;
+    }
+
+    public void setSubtype(Long subtype) {
+        this.subtype = subtype;
+    }
+
+    public Boolean getIsImportant() {
+        return isImportant;
+    }
+
+    public void setIsImportant(Boolean isImportant) {
+        this.isImportant = isImportant;
     }
 
     public Double getLat() {
