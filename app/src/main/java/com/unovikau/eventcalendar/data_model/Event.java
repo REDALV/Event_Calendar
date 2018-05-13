@@ -12,6 +12,8 @@ public class Event {
     private String name;
     private String article;
     private String address;
+    private String time;
+    private String timeEnd;
     private GregorianCalendar date;
     private GregorianCalendar dateEnd;
     private Boolean isImportant;
@@ -28,7 +30,8 @@ public class Event {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Event(String name, String article, String address, String date, String dateEnd, Boolean isImportant, Double lat, Double lng, Long type, Long subtype, List<String> images) {
+    public Event(String name, String article, String address, String time, String timeEnd, String date, String dateEnd,
+                 Boolean isImportant, Double lat, Double lng, Long type, Long subtype, List<String> images) {
         String[] array = date.split(".");
         this.date = new GregorianCalendar(Integer.parseInt(array[2]), Integer.parseInt(array[1])-1, Integer.parseInt(array[0]));
 
@@ -42,6 +45,8 @@ public class Event {
         this.article = article;
         this.address = address;
         this.isImportant = isImportant;
+        this.time = time;
+        this.timeEnd = timeEnd;
         this.lat = lat;
         this.lng = lng;
         this.type = type;
@@ -76,6 +81,22 @@ public class Event {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getTimeEnd() {
+        return timeEnd;
+    }
+
+    public void setTimeEnd(String timeEnd) {
+        this.timeEnd = timeEnd;
     }
 
     public GregorianCalendar getDate() {

@@ -105,7 +105,7 @@ public class EventListFragment extends Fragment {
                 }
 
                 adapter = new EventListAdapter(eventList,getActivity());
-                
+
                 if(selectedDate == null)
                     adapter.getFilter().filter(String.valueOf(month + 1) + "." + String.valueOf(year));
                 else
@@ -117,7 +117,7 @@ public class EventListFragment extends Fragment {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                        Event dataModel = eventList.get(position);
+                        Event dataModel = (Event) listView.getAdapter().getItem(position);
                         Gson gson = new Gson();
                         String json = gson.toJson(dataModel);
 

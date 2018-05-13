@@ -17,6 +17,8 @@ public class EventDetailsFragment extends Fragment {
 
     TextView eventName;
     TextView eventDate;
+    TextView eventTime;
+    TextView eventPlace;
     TextView eventArticle;
 
     private Event event;
@@ -33,6 +35,8 @@ public class EventDetailsFragment extends Fragment {
 
         eventName = (TextView) getView().findViewById(R.id.event_name);
         eventDate = (TextView) getView().findViewById(R.id.event_date);
+        eventTime = (TextView) getView().findViewById(R.id.event_time);
+        eventPlace = (TextView) getView().findViewById(R.id.event_place);
         eventArticle = (TextView) getView().findViewById(R.id.event_article);
 
         if(getArguments() != null){
@@ -41,7 +45,12 @@ public class EventDetailsFragment extends Fragment {
             this.event = gson.fromJson(jsonEvent, Event.class);
 
             this.eventName.setText(this.event.getName());
-            this.eventDate.setText(this.event.getDateString());
+            this.eventDate.setText(getString(R.string.event_details_date, this.event.getDateString()));
+            if(this.event.getTimeEnd().equals(""))
+                this.eventTime.setText(getString(R.string.event_details_time, this.event.getTime()));
+            else
+                this.eventTime.setText(getString(R.string.event_details_time_interval, this.event.getTime(), this.event.getTimeEnd()));
+            this.eventPlace.setText(getString(R.string.event_details_place, this.event.getAddress()));
             this.eventArticle.setText(this.event.getArticle());
         }
 
