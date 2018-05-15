@@ -7,15 +7,19 @@
         <item
             android:id="@+id/nav_events_list"
             android:icon="@drawable/ic_events_list"
-            android:title="События" />
+            android:title="@string/events" />
         <item
             android:id="@+id/nav_calendar"
             android:icon="@drawable/ic_calendar"
-            android:title="Календарь" />
+            android:title="@string/calendar" />
         <item
             android:id="@+id/nav_map"
             android:icon="@drawable/ic_menu_map"
-            android:title="Карта" />
+            android:title="@string/map" />
+        <item
+            android:id="@+id/nav_search"
+            android:icon="@drawable/ic_menu_search"
+            android:title="@string/search" />
     </group>
 
     <item android:title="Служебные">
@@ -23,11 +27,11 @@
             <item
                 android:id="@+id/nav_settings"
                 android:icon="@drawable/ic_settings"
-                android:title="Настройки" />
+                android:title="@string/settings" />
             <item
                 android:id="@+id/nav_about"
                 android:icon="@drawable/ic_info_outline"
-                android:title="О приложении" />
+                android:title="@string/about" />
         </menu>
     </item>
 

@@ -29,7 +29,7 @@ import java.util.ArrayList;
 
 public class EventListAdapter extends BaseAdapter implements View.OnClickListener, Filterable{
     private ArrayList<Event> dataSet;
-    DateFilter filter;
+    Filter filter;
     Context mContext;
     private ArrayList<Event> filterList;
 
@@ -168,6 +168,16 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
         return filter;
     }
 
+    public Filter getStringFilter() {
+        // TODO Auto-generated method stub
+        if(filter == null)
+        {
+            filter=new StringFilter();
+        }
+
+        return filter;
+    }
+
 
     class DateFilter extends Filter
     {
@@ -190,6 +200,53 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
                 {
                     String curDate = filterList.get(i).getDateString();
                     if(curDate.contains(constraint))
+                    {
+                        filters.add(filterList.get(i));
+                    }
+                }
+
+                results.count=filters.size();
+                results.values=filters;
+
+            }else
+            {
+                results.count=filterList.size();
+                results.values=filterList;
+
+            }
+
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            // TODO Auto-generated method stub
+
+            dataSet=(ArrayList<Event>) results.values;
+            notifyDataSetChanged();
+        }
+
+    }
+
+    class StringFilter extends Filter
+    {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            // TODO Auto-generated method stub
+
+            FilterResults results=new FilterResults();
+
+            if(constraint != null && constraint.length()>0)
+            {
+                //CONSTARINT TO UPPER
+                constraint=constraint.toString().toUpperCase();
+
+                ArrayList<Event> filters=new ArrayList<Event>();
+
+                //get specific items
+                for(int i=0;i<filterList.size();i++)
+                {
+                    if(filterList.get(i).getName().toUpperCase().contains(constraint))
                     {
                         filters.add(filterList.get(i));
                     }

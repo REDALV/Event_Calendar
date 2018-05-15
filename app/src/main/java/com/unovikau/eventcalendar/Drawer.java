@@ -18,6 +18,7 @@ import android.content.Intent;
 import com.unovikau.eventcalendar.fragments.CalendarFragment;
 import com.unovikau.eventcalendar.fragments.EventListFragment;
 import com.unovikau.eventcalendar.fragments.GMapFragment;
+import com.unovikau.eventcalendar.fragments.SearchFragment;
 
 public class Drawer extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -87,6 +88,8 @@ public class Drawer extends AppCompatActivity
             fragmentManager.beginTransaction().replace(R.id.content_frame, new CalendarFragment()).addToBackStack("calendar").commit();
         } else if (id == R.id.nav_map) {
             fragmentManager.beginTransaction().replace(R.id.content_frame, new GMapFragment()).addToBackStack("google_map").commit();
+        } else if (id == R.id.nav_search) {
+            fragmentManager.beginTransaction().replace(R.id.content_frame, new SearchFragment()).addToBackStack("search").commit();
         } else if (id == R.id.nav_settings) {
 
         } else if (id == R.id.nav_about) {
