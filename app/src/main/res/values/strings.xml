@@ -14,8 +14,14 @@
     <string name="search">Поиск</string>
 
     <string name="event_details_time_interval">Время: %1$s - %2$s</string>
-    <string name="event_details_date">Дата: \t\t\t%1$s</string>
     <string name="event_details_time">Время: %1$s</string>
+
+    <string name="event_details_date">Дата: \t\t\t%1$s</string>
+    <string name="event_details_date_interval">Дата: \t\t\t%1$s - %2$s</string>
+
+    <string name="event_list_item_date">%1$s</string>
+    <string name="event_list_item_date_interval">%1$s - %2$s</string>
+
     <string name="event_details_place">Место: %1$s</string>
 
     <string-array name="months_ru">

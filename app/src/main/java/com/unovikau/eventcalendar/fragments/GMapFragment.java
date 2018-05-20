@@ -3,6 +3,7 @@ package com.unovikau.eventcalendar.fragments;
 import android.Manifest;
 import android.app.Fragment;
 
+import android.app.FragmentManager;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,6 +19,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -26,7 +28,8 @@ import com.unovikau.eventcalendar.data_model.Event;
 
 import java.util.List;
 
-public class GMapFragment extends Fragment implements OnMapReadyCallback {
+public class GMapFragment extends Fragment implements OnMapReadyCallback,
+        GoogleMap.OnInfoWindowClickListener {
 
     private GoogleMap mGoogleMap;
     private Event event;
@@ -67,6 +70,7 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
+        mGoogleMap.setOnInfoWindowClickListener(this);
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
@@ -87,8 +91,16 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
 
                 for (Event x: eventsInTwoWeeks) {
                     LatLng latLng = new LatLng(x.getLat(), x.getLng());
-                    googleMap.addMarker(new MarkerOptions().position(latLng)
-                            .title(x.getName()));
+                    if(x.getDateEnd() != null){
+                        googleMap.addMarker(new MarkerOptions().position(latLng)
+                                .title(x.getName()).snippet(getString(R.string.event_details_date_interval, x.getDateString(), x.getDateEndString()))).setTag(x);
+                    }
+                    else{
+                        googleMap.addMarker(new MarkerOptions().position(latLng)
+                                .title(x.getName()).snippet(getString(R.string.event_details_date, x.getDateString()))).setTag(x);
+                    }
+
+
                 }
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.424195, 31.014671),10));
                 googleMap.animateCamera(CameraUpdateFactory.zoomIn());
@@ -96,5 +108,21 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
                 googleMap.animateCamera(CameraUpdateFactory.zoomTo(12), 2000, null);
             }
         }
+    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        Event dataModel = (Event) marker.getTag();
+        Gson gson = new Gson();
+        String json = gson.toJson(dataModel);
+
+        FragmentManager fragmentManager = getFragmentManager();
+
+        EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("event", json);
+        eventDetailsFragment.setArguments(bundle);
+
+        fragmentManager.beginTransaction().add(R.id.content_frame, eventDetailsFragment).addToBackStack("event_details").commit();
     }
 }

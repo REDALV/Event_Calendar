@@ -23,9 +23,6 @@ public class Event {
     private Long subtype;
     private List<String> images;
 
-
-
-
     public Event() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
@@ -172,5 +169,11 @@ public class Event {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy");
         simpleDateFormat.setCalendar(this.date);
         return simpleDateFormat.format(this.date.getTime());
+    }
+
+    public String getDateEndString() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        simpleDateFormat.setCalendar(this.dateEnd);
+        return simpleDateFormat.format(this.dateEnd.getTime());
     }
 }

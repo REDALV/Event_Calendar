@@ -102,7 +102,7 @@ public class EventListFragment extends Fragment {
         if(selectedDate == null)
             adapter.getFilter().filter(String.valueOf(month + 1) + "." + String.valueOf(year));
         else
-            adapter.getFilter().filter(selectedDate);
+            adapter.getDateFilter().filter(selectedDate);
 
         listView = getView().findViewById(R.id.event_list_view);
         listView.setAdapter(adapter);

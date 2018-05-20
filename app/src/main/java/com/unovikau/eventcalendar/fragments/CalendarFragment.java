@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.unovikau.eventcalendar.R;
 
 import java.text.SimpleDateFormat;

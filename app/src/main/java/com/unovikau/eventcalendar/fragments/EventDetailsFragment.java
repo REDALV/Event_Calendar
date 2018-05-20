@@ -49,7 +49,10 @@ public class EventDetailsFragment extends Fragment {
             this.event = gson.fromJson(jsonEvent, Event.class);
 
             this.eventName.setText(this.event.getName());
-            this.eventDate.setText(getString(R.string.event_details_date, this.event.getDateString()));
+            if(this.event.getDateEnd() == null)
+                this.eventDate.setText(getString(R.string.event_details_date, this.event.getDateString()));
+            else
+                this.eventDate.setText(getString(R.string.event_details_date_interval, this.event.getDateString(), this.event.getDateEndString()));
             if(this.event.getTimeEnd().equals(""))
                 this.eventTime.setText(getString(R.string.event_details_time, this.event.getTime()));
             else

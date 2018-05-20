@@ -32,8 +32,11 @@ import com.unovikau.eventcalendar.fragments.EventListFragment;
 import com.unovikau.eventcalendar.fragments.GMapFragment;
 import com.unovikau.eventcalendar.fragments.SearchFragment;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -45,6 +48,8 @@ public class Drawer extends AppCompatActivity
     List<Event> eventList;
 
     Fragment eventListFragment;
+    private static final String TAG = "Drawer";
+    private static final int MILLISECONDS_IN_TWO_WEEKS = 1209600000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,12 +182,12 @@ public class Drawer extends AppCompatActivity
             List<Event> eventsInTwoWeeks = getEventsInTwoWeeks();
 
             String eventsJson = gson.toJson(eventsInTwoWeeks);
-            Bundle bundleGmap = new Bundle();
-            bundleGmap.putString("eventsInTwoWeeks", eventsJson);
+            Bundle bundleGMap = new Bundle();
+            bundleGMap.putString("eventsInTwoWeeks", eventsJson);
 
 
             GMapFragment gMapFragment = new GMapFragment();
-            gMapFragment.setArguments(bundleGmap);
+            gMapFragment.setArguments(bundleGMap);
             fragmentManager.beginTransaction().add(R.id.content_frame, gMapFragment).addToBackStack("google_map").commit();
 
             //fragmentManager.beginTransaction().replace(R.id.content_frame, new GMapFragment()).addToBackStack("google_map").commit();
@@ -190,7 +195,7 @@ public class Drawer extends AppCompatActivity
 
             SearchFragment searchFragment = new SearchFragment();
             searchFragment.setArguments(bundle);
-            fragmentManager.beginTransaction().replace(R.id.content_frame, searchFragment).addToBackStack("search").commit();
+            fragmentManager.beginTransaction().add(R.id.content_frame, searchFragment).addToBackStack("search").commit();
             //fragmentManager.beginTransaction().replace(R.id.content_frame, new SearchFragment()).addToBackStack("search").commit();
 
         } else if (id == R.id.nav_settings) {
@@ -203,21 +208,38 @@ public class Drawer extends AppCompatActivity
         return true;
     }
 
-    private boolean isDateInTwoWeeks(GregorianCalendar date){
-        GregorianCalendar twoWeeksAfter = new GregorianCalendar();
-        twoWeeksAfter.add(Calendar.DAY_OF_MONTH, 14);
-        return date.after(new GregorianCalendar()) && date.before(twoWeeksAfter);
+    private boolean isDateInTwoWeeks(String date){
+        //GregorianCalendar twoWeeksAfter = new GregorianCalendar();
+        //twoWeeksAfter.add(Calendar.DAY_OF_MONTH, 14);
+        //return !(date.before(new GregorianCalendar()) || date.after(twoWeeksAfter));
+
+        boolean result = false;
+        try{
+            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+            Date eventDate = sdf.parse(date);
+            Date today = new Date();
+            Date twoWeeksAfter = new Date(today.getTime() + MILLISECONDS_IN_TWO_WEEKS);
+
+            if(!(eventDate.before(today) || eventDate.after(twoWeeksAfter)))
+                result = true;
+
+        }
+        catch (ParseException ex){
+            Log.i(TAG, ex.getMessage());
+        }
+
+        return result;
     }
 
     private List<Event> getEventsInTwoWeeks(){
         List<Event> resultEvents = new ArrayList<>(0);
         for (Event x: eventList) {
             if(x.getDateEnd() != null){
-                if(isDateInTwoWeeks(x.getDate()) || isDateInTwoWeeks(x.getDateEnd()))
+                if(isDateInTwoWeeks(x.getDateString()) || isDateInTwoWeeks(x.getDateEndString()))
                     resultEvents.add(x);
             }
             else{
-                if(isDateInTwoWeeks(x.getDate()))
+                if(isDateInTwoWeeks(x.getDateString()))
                     resultEvents.add(x);
             }
         }

@@ -4,28 +4,32 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.widget.RecyclerView;
+import android.text.method.DateTimeKeyListener;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.unovikau.eventcalendar.R;
-import com.unovikau.eventcalendar.fragments.EventListFragment;
 import com.unovikau.eventcalendar.fragments.GMapFragment;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 public class EventListAdapter extends BaseAdapter implements View.OnClickListener, Filterable{
@@ -33,6 +37,8 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
     Filter filter;
     Context mContext;
     private List<Event> filterList;
+
+    private static final String TAG = "EventListAdapter";
 
 
     // View lookup cache
@@ -151,16 +157,50 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
         }
         viewHolder.event_type_item.setImageDrawable(typeIcon);
         viewHolder.txtName.setText(dataModel.getName());
-        viewHolder.txtDate.setText(dataModel.getDateString());
+
+        if(dataModel.getDateEnd() == null)
+            viewHolder.txtDate.setText(dataModel.getDateString());
+        else
+            viewHolder.txtDate.setText(dataModel.getDateString() + " - " + dataModel.getDateEndString());
+
         viewHolder.show_on_map.setOnClickListener(this);
         viewHolder.show_on_map.setTag(position);
         // Return the completed view to render on screen
         return convertView;
     }
 
+    /**
+     * Get month filter.
+     * @return month filter
+     */
     @Override
     public Filter getFilter() {
-        // TODO Auto-generated method stub
+        if(filter == null)
+        {
+            filter=new MonthFilter();
+        }
+
+        return filter;
+    }
+
+    /**
+     * Get name filter.
+     * @return name filter
+     */
+    public Filter getNameFilter() {
+        if(filter == null)
+        {
+            filter=new NameFilter();
+        }
+
+        return filter;
+    }
+
+    /**
+     * Get date filter.
+     * @return date filter
+     */
+    public Filter getDateFilter() {
         if(filter == null)
         {
             filter=new DateFilter();
@@ -169,16 +209,51 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
         return filter;
     }
 
-    public Filter getStringFilter() {
-        // TODO Auto-generated method stub
-        if(filter == null)
-        {
-            filter=new StringFilter();
+
+    class MonthFilter extends Filter {
+
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            // TODO Auto-generated method stub
+
+            FilterResults results = new FilterResults();
+
+            if (constraint != null && constraint.length() > 0) {
+                //CONSTARINT TO UPPER
+                constraint = constraint.toString().toUpperCase();
+
+                ArrayList<Event> filters = new ArrayList<Event>();
+
+                //get specific items
+                for (int i = 0; i < filterList.size(); i++) {
+                    String startDate = filterList.get(i).getDateString();
+                    String endDate = filterList.get(i).getDateString();
+
+                    if (startDate.contains(constraint) || endDate.contains(constraint)) {
+                        filters.add(filterList.get(i));
+                    }
+                }
+
+                results.count = filters.size();
+                results.values = filters;
+
+            } else {
+                results.count = filterList.size();
+                results.values = filterList;
+
+            }
+
+            return results;
         }
 
-        return filter;
-    }
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            // TODO Auto-generated method stub
 
+            dataSet = (ArrayList<Event>) results.values;
+            notifyDataSetChanged();
+        }
+    }
 
     class DateFilter extends Filter
     {
@@ -187,23 +262,41 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
         protected FilterResults performFiltering(CharSequence constraint) {
             // TODO Auto-generated method stub
 
-            FilterResults results=new FilterResults();
+            FilterResults results = new FilterResults();
 
             if(constraint != null && constraint.length()>0)
             {
-                //CONSTARINT TO UPPER
-                constraint=constraint.toString().toUpperCase();
+                String constr = constraint.toString();
+                String[] values = constr.split("\\.");
+                List<Event> filters=new ArrayList<Event>();
 
-                ArrayList<Event> filters=new ArrayList<Event>();
+                //GregorianCalendar selected_date = new GregorianCalendar(Integer.parseInt(values[2]),Integer.parseInt(values[1]),Integer.parseInt(values[0]));
+                try{
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+                    Date selectedDate = sdf.parse(constraint.toString());
 
-                //get specific items
-                for(int i=0;i<filterList.size();i++)
-                {
-                    String curDate = filterList.get(i).getDateString();
-                    if(curDate.contains(constraint))
+
+                    //get specific items
+                    for(Event x: filterList)
                     {
-                        filters.add(filterList.get(i));
+                        Date startDate = sdf.parse(x.getDateString());
+
+                        //boolean x1 = selected_date.before(startDate);
+                        //boolean x2 = selected_date.getTime().after(endDate.getTime());
+
+                        if(x.getDateEnd() != null){
+                            Date endDate = sdf.parse(x.getDateEndString());
+                            if(!(selectedDate.before(startDate) || selectedDate.after(endDate)))
+                                filters.add(x);
+                        }
+                        else{
+                            if(selectedDate.equals(startDate))
+                                filters.add(x);
+                        }
                     }
+                }
+                catch (ParseException ex){
+                    Log.i(TAG, ex.getMessage());
                 }
 
                 results.count=filters.size();
@@ -221,7 +314,6 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            // TODO Auto-generated method stub
 
             dataSet=(ArrayList<Event>) results.values;
             notifyDataSetChanged();
@@ -229,7 +321,7 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
 
     }
 
-    class StringFilter extends Filter
+    class NameFilter extends Filter
     {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
