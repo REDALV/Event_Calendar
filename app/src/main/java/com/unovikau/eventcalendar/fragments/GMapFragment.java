@@ -20,13 +20,17 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.unovikau.eventcalendar.R;
 import com.unovikau.eventcalendar.data_model.Event;
+
+import java.util.List;
 
 public class GMapFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mGoogleMap;
     private Event event;
+    private List<Event> eventsInTwoWeeks;
 
     private FusedLocationProviderClient mFusedLocationClient;
 
@@ -35,9 +39,16 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         if(getArguments() != null){
-            String jsonEvent = getArguments().getString("event");
+            if(getArguments().getString("event") != null){
+                String jsonEvent = getArguments().getString("event");
+                Gson gson = new Gson();
+                this.event = gson.fromJson(jsonEvent, Event.class);
+            }
+
+
             Gson gson = new Gson();
-            this.event = gson.fromJson(jsonEvent, Event.class);
+            String jsonEvents = getArguments().getString("eventsInTwoWeeks");
+            this.eventsInTwoWeeks = gson.fromJson(jsonEvents, new TypeToken<List<Event>>(){}.getType());
         }
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
@@ -74,9 +85,15 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
                 //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));
                 // Zoom in, animating the camera.
 
+                for (Event x: eventsInTwoWeeks) {
+                    LatLng latLng = new LatLng(x.getLat(), x.getLng());
+                    googleMap.addMarker(new MarkerOptions().position(latLng)
+                            .title(x.getName()));
+                }
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.424195, 31.014671),10));
                 googleMap.animateCamera(CameraUpdateFactory.zoomIn());
                 // Zoom out to zoom level 10, animating with a duration of 2 seconds.
-                googleMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
+                googleMap.animateCamera(CameraUpdateFactory.zoomTo(12), 2000, null);
             }
         }
     }

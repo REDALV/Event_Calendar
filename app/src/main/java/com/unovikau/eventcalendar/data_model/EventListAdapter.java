@@ -26,12 +26,13 @@ import com.unovikau.eventcalendar.fragments.EventListFragment;
 import com.unovikau.eventcalendar.fragments.GMapFragment;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class EventListAdapter extends BaseAdapter implements View.OnClickListener, Filterable{
-    private ArrayList<Event> dataSet;
+    private List<Event> dataSet;
     Filter filter;
     Context mContext;
-    private ArrayList<Event> filterList;
+    private List<Event> filterList;
 
 
     // View lookup cache
@@ -42,7 +43,7 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
         ImageView show_on_map;
     }
 
-    public EventListAdapter(ArrayList<Event> data, Context context) {
+    public EventListAdapter(List<Event> data, Context context) {
         //super(context, R.layout.row_event_item, data);
         this.dataSet = data;
         this.filterList = data;
@@ -74,7 +75,7 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
                 bundle.putString("event", json);
                 gMapFragment.setArguments(bundle);
 
-                fragmentManager.beginTransaction().replace(R.id.content_frame, gMapFragment).addToBackStack("google_map_item").commit();
+                fragmentManager.beginTransaction().add(R.id.content_frame, gMapFragment).addToBackStack("google_map_item").commit();
                 break;
             }
         }
@@ -241,7 +242,7 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
                 //CONSTARINT TO UPPER
                 constraint=constraint.toString().toUpperCase();
 
-                ArrayList<Event> filters=new ArrayList<Event>();
+                List<Event> filters=new ArrayList<Event>();
 
                 //get specific items
                 for(int i=0;i<filterList.size();i++)

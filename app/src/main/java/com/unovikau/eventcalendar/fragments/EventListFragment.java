@@ -23,6 +23,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.unovikau.eventcalendar.MonthYearPickerDialog;
 import com.unovikau.eventcalendar.R;
 import com.unovikau.eventcalendar.data_model.Event;
@@ -30,6 +31,7 @@ import com.unovikau.eventcalendar.data_model.EventListAdapter;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
@@ -37,7 +39,7 @@ public class EventListFragment extends Fragment {
 
     String[] months;
 
-    ArrayList<Event> eventList;
+    List<Event> eventList;
     ListView listView;
     private static EventListAdapter adapter;
 
@@ -51,11 +53,21 @@ public class EventListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(getArguments() != null){
+        if(getArguments().getString("selected_date") != null){
             this.selectedDate = getArguments().getString("selected_date");
         }
         else
             this.selectedDate = null;
+
+        Calendar cal = Calendar.getInstance();
+        if (savedInstanceState == null) {
+
+            year = cal.get(Calendar.YEAR);
+            month = cal.get(Calendar.MONTH);
+        } else {
+            year= savedInstanceState.getInt("year", cal.get(Calendar.YEAR));
+            month= savedInstanceState.getInt("month", cal.get(Calendar.MONTH));
+        }
         return inflater.inflate(R.layout.fragment_event_list, container, false);
     }
 
@@ -66,9 +78,7 @@ public class EventListFragment extends Fragment {
         current_month_tv = (TextView) getView().findViewById(R.id.current_month);
 
         months = getResources().getStringArray(R.array.months_ru);
-        Calendar cal = Calendar.getInstance();
-        year = cal.get(Calendar.YEAR);
-        month = cal.get(Calendar.MONTH);
+
 
         if(this.selectedDate == null){
             /*
@@ -80,65 +90,38 @@ public class EventListFragment extends Fragment {
             current_month_tv.setText(months[month] + " " + year);
         }
         else {
-            String[] date = this.selectedDate.split(".");
             current_month_tv.setText(this.selectedDate);
         }
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("events");
-        myRef.keepSynced(true);
+        String jsonEvents = getArguments().getString("events");
+        Gson gson = new Gson();
+        this.eventList = gson.fromJson(jsonEvents, new TypeToken<List<Event>>(){}.getType());
 
-        eventList = new ArrayList<>();
+        adapter = new EventListAdapter(eventList,getActivity());
 
+        if(selectedDate == null)
+            adapter.getFilter().filter(String.valueOf(month + 1) + "." + String.valueOf(year));
+        else
+            adapter.getFilter().filter(selectedDate);
 
-        // Read from the database
-        /*myRef.addValueEventListener(new ValueEventListener() {*/
-        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        listView = getView().findViewById(R.id.event_list_view);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-                    Event post = postSnapshot.getValue(Event.class);
-                    eventList.add(post);
-                    Log.d("Get Data", post.toString());
-                }
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                adapter = new EventListAdapter(eventList,getActivity());
+                Event dataModel = (Event) listView.getAdapter().getItem(position);
+                Gson gson = new Gson();
+                String json = gson.toJson(dataModel);
 
-                if(selectedDate == null)
-                    adapter.getFilter().filter(String.valueOf(month + 1) + "." + String.valueOf(year));
-                else
-                    adapter.getFilter().filter(selectedDate);
+                FragmentManager fragmentManager = getFragmentManager();
 
-                listView = getView().findViewById(R.id.event_list_view);
-                listView.setAdapter(adapter);
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("event", json);
+                eventDetailsFragment.setArguments(bundle);
 
-                        Event dataModel = (Event) listView.getAdapter().getItem(position);
-                        Gson gson = new Gson();
-                        String json = gson.toJson(dataModel);
-
-                        FragmentManager fragmentManager = getFragmentManager();
-
-                        EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
-                        Bundle bundle = new Bundle();
-                        bundle.putString("event", json);
-                        eventDetailsFragment.setArguments(bundle);
-
-                        fragmentManager.beginTransaction().replace(R.id.content_frame, eventDetailsFragment).addToBackStack("event_details").commit();
-                    }
-                });
-
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w(TAG, "Failed to read value.", error.toException());
+                fragmentManager.beginTransaction().add(R.id.content_frame, eventDetailsFragment).addToBackStack("event_details").commit();
             }
         });
 
@@ -162,6 +145,23 @@ public class EventListFragment extends Fragment {
             }
         };
         current_month_tv.setOnClickListener(oclDate);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("month", month);
+        outState.putInt("year", year);
+
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if(savedInstanceState != null){
+            month = savedInstanceState.getInt("month");
+            year = savedInstanceState.getInt("year");
+        }
 
     }
 }

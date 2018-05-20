@@ -6,7 +6,7 @@
 
     <string name="action_settings">Настройки</string>
 
-    <string name="nav_map">Карта</string>
+    <string name="nav_map">Ближайшие события на карте</string>
     <string name="title_activity_maps">Map</string>
 
     <string name="ok">OK</string>

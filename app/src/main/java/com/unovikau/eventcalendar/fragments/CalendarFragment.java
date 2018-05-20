@@ -57,6 +57,7 @@ public class CalendarFragment  extends Fragment {
 
                 Bundle bundle = new Bundle();
                 bundle.putString("selected_date", selected_date);
+                bundle.putString("events", getArguments().getString("events"));
                 eventListFragment.setArguments(bundle);
 
                 fragmentManager.beginTransaction().replace(R.id.content_frame, eventListFragment).addToBackStack("event_list").commit();

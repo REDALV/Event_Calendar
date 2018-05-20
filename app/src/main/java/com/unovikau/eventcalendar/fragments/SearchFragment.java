@@ -20,17 +20,19 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.unovikau.eventcalendar.R;
 import com.unovikau.eventcalendar.data_model.Event;
 import com.unovikau.eventcalendar.data_model.EventListAdapter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
 public class SearchFragment extends Fragment {
 
-    private ArrayList<Event> eventList;
+    private List<Event> eventList;
     private ListView listView;
     private EventListAdapter adapter;
     EditText inputSearch;
@@ -51,9 +53,32 @@ public class SearchFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("events");
-        myRef.keepSynced(true);
+        String jsonEvents = getArguments().getString("events");
+        Gson gson = new Gson();
+        this.eventList = gson.fromJson(jsonEvents, new TypeToken<List<Event>>(){}.getType());
+
+        adapter = new EventListAdapter(eventList,getActivity());
+
+        listView = getView().findViewById(R.id.search_list_view);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Event dataModel = (Event) listView.getAdapter().getItem(position);
+                Gson gson = new Gson();
+                String json = gson.toJson(dataModel);
+
+                FragmentManager fragmentManager = getFragmentManager();
+
+                EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("event", json);
+                eventDetailsFragment.setArguments(bundle);
+
+                fragmentManager.beginTransaction().replace(R.id.content_frame, eventDetailsFragment).addToBackStack("event_details").commit();
+            }
+        });
 
         eventList = new ArrayList<>();
         inputSearch = getActivity().findViewById(R.id.inputSearch);
@@ -79,58 +104,6 @@ public class SearchFragment extends Fragment {
             }
         });
 
-
-        // Read from the database
-        /*myRef.addValueEventListener(new ValueEventListener() {*/
-        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-                    Event post = postSnapshot.getValue(Event.class);
-                    eventList.add(post);
-                    Log.d("Get Data", post.toString());
-                }
-
-                adapter = new EventListAdapter(eventList,getActivity());
-
-                /*
-                if(selectedDate == null)
-                    adapter.getFilter().filter(String.valueOf(month + 1) + "." + String.valueOf(year));
-                else
-                    adapter.getFilter().filter(selectedDate);*/
-
-                listView = getView().findViewById(R.id.search_list_view);
-                listView.setAdapter(adapter);
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                        Event dataModel = (Event) listView.getAdapter().getItem(position);
-                        Gson gson = new Gson();
-                        String json = gson.toJson(dataModel);
-
-                        FragmentManager fragmentManager = getFragmentManager();
-
-                        EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
-                        Bundle bundle = new Bundle();
-                        bundle.putString("event", json);
-                        eventDetailsFragment.setArguments(bundle);
-
-                        fragmentManager.beginTransaction().replace(R.id.content_frame, eventDetailsFragment).addToBackStack("event_details").commit();
-                    }
-                });
-
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w(TAG, "Failed to read value.", error.toException());
-            }
-        });
     }
 
 }
