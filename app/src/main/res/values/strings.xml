@@ -11,6 +11,7 @@
 
     <string name="ok">OK</string>
     <string name="cancel">Назад</string>
+    <string name="reset">Сбросить</string>
     <string name="search">Поиск</string>
 
     <string name="event_details_time_interval">Время: %1$s - %2$s</string>

@@ -6,8 +6,11 @@ import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,6 +20,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.Manifest;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -70,6 +74,19 @@ public class Drawer extends AppCompatActivity
 
         getDataFromFireBase();
         scheduleJob();
+
+        // Запрос разрешения для использования карт
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        1);
+            }
+        }
     }
 
     private void scheduleJob(){
@@ -95,9 +112,10 @@ public class Drawer extends AppCompatActivity
         ComponentName componentName = new ComponentName(this,
                 ReminderJobService.class);
 
-        JobInfo jobInfo = new JobInfo.Builder(1, componentName)
+        JobInfo jobInfo = new JobInfo.Builder(3, componentName)
                 .setPeriodic(36000000)
-                .setPersisted(true).build();
+                .setPersisted(true)
+                .build();
 
         jobScheduler.schedule(jobInfo);
     }

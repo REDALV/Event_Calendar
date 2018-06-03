@@ -31,6 +31,7 @@ import java.util.List;
 
 public class EventListAdapter extends BaseAdapter implements View.OnClickListener, Filterable{
     private List<Event> dataSet;
+
     Filter filter;
     Context mContext;
     private List<Event> filterList;
@@ -229,11 +230,16 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
         protected FilterResults performFiltering(CharSequence constraint) {
             // TODO Auto-generated method stub
 
+            String[] args = constraint.toString().split(";;;");
+            int type = 0;
+            if(args.length > 1)
+                type = Integer.valueOf(args[1]);
+
             FilterResults results = new FilterResults();
 
-            if (constraint != null && constraint.length() > 0) {
-                //CONSTARINT TO UPPER
-                constraint = constraint.toString().toUpperCase();
+            if (constraint.length() > 0) {
+
+                constraint = args[0];
 
                 ArrayList<Event> filters = new ArrayList<Event>();
 
@@ -242,7 +248,12 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
                     if(filterList.get(i).getDateEnd() == null){
                         String startDate = filterList.get(i).getDateString();
                         if (startDate.contains(constraint)) {
-                            filters.add(filterList.get(i));
+                            if(type != 0){
+                                if(filterList.get(i).getType() == type)
+                                    filters.add(filterList.get(i));
+                            }
+                            else
+                                filters.add(filterList.get(i));
                         }
                     }
                     else{
@@ -250,7 +261,12 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
                         String endDate = filterList.get(i).getDateEndString();
 
                         if (startDate.contains(constraint) || endDate.contains(constraint)) {
-                            filters.add(filterList.get(i));
+                            if(type != 0){
+                                if(filterList.get(i).getType() == type)
+                                    filters.add(filterList.get(i));
+                            }
+                            else
+                                filters.add(filterList.get(i));
                         }
                     }
 
@@ -290,6 +306,11 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
         protected FilterResults performFiltering(CharSequence constraint) {
             // TODO Auto-generated method stub
 
+            String[] args = constraint.toString().split(";;;");
+            int type = 0;
+            if(args.length > 1)
+                type = Integer.valueOf(args[1]);
+
             FilterResults results = new FilterResults();
 
             if(constraint != null && constraint.length()>0)
@@ -310,12 +331,22 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
 
                         if(x.getDateEnd() != null){
                             Date endDate = x.getDateEnd();
-                            if(!(selectedDate.before(startDate) || selectedDate.after(endDate)))
-                                filters.add(x);
+                            if(!(selectedDate.before(startDate) || selectedDate.after(endDate))) {
+                                if (type != 0) {
+                                    if (x.getType() == type)
+                                        filters.add(x);
+                                } else
+                                    filters.add(x);
+                            }
                         }
                         else{
-                            if(selectedDate.equals(startDate))
-                                filters.add(x);
+                            if(selectedDate.equals(startDate)) {
+                                if (type != 0) {
+                                    if (x.getType() == type)
+                                        filters.add(x);
+                                } else
+                                    filters.add(x);
+                            }
                         }
                     }
                 }

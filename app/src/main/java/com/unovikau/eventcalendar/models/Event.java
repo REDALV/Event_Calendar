@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 @IgnoreExtraProperties
 public class Event {
@@ -117,7 +118,7 @@ public class Event {
     }
 
     public void setDate(String date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
         try{
             this.date = sdf.parse(date);
         }
@@ -131,7 +132,7 @@ public class Event {
     }
 
     public void setDateEnd(String dateEnd) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
         try{
             this.dateEnd = sdf.parse(dateEnd);
         }
@@ -189,23 +190,30 @@ public class Event {
     }
 
     public String getDateString() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
         return simpleDateFormat.format(this.date.getTime());
     }
 
     public String getDateEndString() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
         return simpleDateFormat.format(this.dateEnd.getTime());
     }
 
     public boolean isPastEvent(){
         boolean result = false;
 
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
         Date today = new Date();
+        String todayString = simpleDateFormat.format(today);
+
         if(this.dateEnd == null){
+            if(todayString.equals(this.getDateString()))
+                return false;
             result = this.date.before(today);
         }
         else{
+            if(todayString.equals(this.getDateString()) || todayString.equals(this.getDateEndString()))
+                return false;
             result =  this.date.before(today) && this.dateEnd.before(today);
         }
 

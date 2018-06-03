@@ -68,36 +68,36 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback,
         mGoogleMap.setOnInfoWindowClickListener(this);
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            googleMap.setMyLocationEnabled(true);
-            if(this.event != null){
-                LatLng latLng = new LatLng(this.event.getLat(), this.event.getLng());
-                googleMap.addMarker(new MarkerOptions().position(latLng)
-                        .title(this.event.getName()));
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));
-                // Zoom in, animating the camera.
-                googleMap.animateCamera(CameraUpdateFactory.zoomIn());
-                // Zoom out to zoom level 10, animating with a duration of 2 seconds.
-                googleMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
-            }
-            else{
-                for (Event x: eventsInTwoWeeks) {
-                    LatLng latLng = new LatLng(x.getLat(), x.getLng());
-                    if(x.getDateEnd() != null){
-                        googleMap.addMarker(new MarkerOptions().position(latLng)
-                                .title(x.getName()).snippet(getString(R.string.event_details_date_interval, x.getDateString(), x.getDateEndString()))).setTag(x);
-                    }
-                    else{
-                        googleMap.addMarker(new MarkerOptions().position(latLng)
-                                .title(x.getName()).snippet(getString(R.string.event_details_date, x.getDateString()))).setTag(x);
-                    }
-
-
+            mGoogleMap.setMyLocationEnabled(true);
+        }
+        if(this.event != null){
+            LatLng latLng = new LatLng(this.event.getLat(), this.event.getLng());
+            mGoogleMap.addMarker(new MarkerOptions().position(latLng)
+                    .title(this.event.getName()));
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));
+            // Zoom in, animating the camera.
+            mGoogleMap.animateCamera(CameraUpdateFactory.zoomIn());
+            // Zoom out to zoom level 10, animating with a duration of 2 seconds.
+            mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
+        }
+        else{
+            for (Event x: eventsInTwoWeeks) {
+                LatLng latLng = new LatLng(x.getLat(), x.getLng());
+                if(x.getDateEnd() != null){
+                    mGoogleMap.addMarker(new MarkerOptions().position(latLng)
+                            .title(x.getName()).snippet(getString(R.string.event_details_date_interval, x.getDateString(), x.getDateEndString()))).setTag(x);
                 }
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.424195, 31.014671),10));
-                googleMap.animateCamera(CameraUpdateFactory.zoomIn());
-                // Zoom out to zoom level 10, animating with a duration of 2 seconds.
-                googleMap.animateCamera(CameraUpdateFactory.zoomTo(12), 2000, null);
+                else{
+                    mGoogleMap.addMarker(new MarkerOptions().position(latLng)
+                            .title(x.getName()).snippet(getString(R.string.event_details_date, x.getDateString()))).setTag(x);
+                }
+
+
             }
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.424195, 31.014671),10));
+            mGoogleMap.animateCamera(CameraUpdateFactory.zoomIn());
+            // Zoom out to zoom level 10, animating with a duration of 2 seconds.
+            mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(12), 2000, null);
         }
     }
 

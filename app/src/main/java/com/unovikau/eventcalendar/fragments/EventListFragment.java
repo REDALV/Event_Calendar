@@ -1,10 +1,13 @@
 package com.unovikau.eventcalendar.fragments;
 
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +20,11 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.unovikau.eventcalendar.dialogs.MonthYearPickerDialog;
 import com.unovikau.eventcalendar.R;
+import com.unovikau.eventcalendar.dialogs.TypePickerDialog;
 import com.unovikau.eventcalendar.models.Event;
 import com.unovikau.eventcalendar.adapters.EventListAdapter;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,15 +34,15 @@ import java.util.List;
 public class EventListFragment extends Fragment {
 
     String[] months;
-
     List<Event> eventList;
-    ListView listView;
     private static EventListAdapter adapter;
-
     int year;
     int month;
     String selectedDate;
+    int selectedType;
 
+    ListView listView;
+    FloatingActionButton filterButton;
     TextView current_month_tv;
 
     @Nullable
@@ -67,6 +72,7 @@ public class EventListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         current_month_tv = (TextView) getView().findViewById(R.id.current_month);
+        filterButton = getView().findViewById(R.id.filter_button);
 
         months = getResources().getStringArray(R.array.months_ru);
 
@@ -82,14 +88,15 @@ public class EventListFragment extends Fragment {
         Gson gson = new Gson();
         this.eventList = gson.fromJson(jsonEvents, new TypeToken<List<Event>>(){}.getType());
 
-        Collections.sort(this.eventList, new DateComparator());
+        this.eventList = sortEventList(this.eventList);
 
         adapter = new EventListAdapter(eventList,getActivity());
-
         if(selectedDate == null)
             adapter.getFilter().filter(String.valueOf(month + 1) + "." + String.valueOf(year));
         else
             adapter.getDateFilter().filter(selectedDate);
+
+
 
         listView = getView().findViewById(R.id.event_list_view);
         listView.setAdapter(adapter);
@@ -112,6 +119,30 @@ public class EventListFragment extends Fragment {
             }
         });
 
+        View.OnClickListener oclTypeFilter = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TypePickerDialog pd = new TypePickerDialog();
+                pd.setSelectedType(selectedType);
+                pd.setListener(new Dialog.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface view, int type) {
+                        selectedType = type;
+                        adapter.removeFilter();
+                        if(selectedDate == null)
+                            adapter.getFilter().filter(String.valueOf(month + 1) + "." + String.valueOf(year) + ";;;" + selectedType);
+                        else
+                            adapter.getDateFilter().filter(selectedDate+ ";;;" + selectedType);
+                    }
+                });
+                pd.show(getFragmentManager(), "MonthYearPickerDialog");
+            }
+        };
+
+        filterButton.setOnClickListener(oclTypeFilter);
+
+
+
         // Selection month listener
         View.OnClickListener oclDate = new View.OnClickListener() {
             @Override
@@ -122,11 +153,12 @@ public class EventListFragment extends Fragment {
                     @Override
                     public void onDateSet(DatePicker view, int selected_year, int selected_month,
                                           int dayOfMonth) {
+                        selectedDate = null;
                         year = selected_year;
                         month = selected_month;
                         current_month_tv.setText(months[selected_month] + " " + selected_year);
                         adapter.removeFilter();
-                        adapter.getFilter().filter(String.valueOf(month + 1) + "." + String.valueOf(year));
+                        adapter.getFilter().filter(String.valueOf(month + 1) + "." + String.valueOf(year) + ";;;" + selectedType);
 
                     }
                 });
@@ -154,6 +186,26 @@ public class EventListFragment extends Fragment {
 
     }
 
+    private List<Event> sortEventList(List<Event> eventList){
+
+        List<Event> pastEvents = new ArrayList<Event>();
+        List<Event> activeEvents = new ArrayList<Event>();
+
+        for (Event event: eventList) {
+            if(event.isPastEvent())
+                pastEvents.add(event);
+            else{
+                activeEvents.add(event);
+            }
+        }
+
+        Collections.sort(pastEvents, new DateComparator());
+        Collections.sort(activeEvents, new DateComparator());
+
+        activeEvents.addAll(pastEvents);
+        return  activeEvents;
+    }
+
     class DateComparator implements Comparator<Event> {
 
 
@@ -161,19 +213,13 @@ public class EventListFragment extends Fragment {
         public int compare(Event o1, Event o2) {
             Date firstDate = o1.getDate();
             Date secondDate = o2.getDate();
-            Date today = new Date();
 
             if(firstDate.equals(secondDate))
                 return 0;
-
-            if(firstDate.before(today) && secondDate.after(today))
-                return 1;
-            if(firstDate.after(today) && secondDate.before(today))
-                return -1;
             if(firstDate.before(secondDate))
-                return 1;
+                return -1;
 
-            return -1;
+            return 1;
 
         }
     }
