@@ -1,4 +1,4 @@
-package com.unovikau.eventcalendar;
+package com.unovikau.eventcalendar.dialogs;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -8,11 +8,9 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.DatePicker;
 import android.widget.NumberPicker;
-import android.widget.Toast;
 
-import java.util.Calendar;
+import com.unovikau.eventcalendar.R;
 
 public class MonthYearPickerDialog extends DialogFragment{
 
@@ -22,7 +20,6 @@ public class MonthYearPickerDialog extends DialogFragment{
     private int year;
     private int month;
 
-
     public void setListener(DatePickerDialog.OnDateSetListener listener) {
         this.listener = listener;
     }
@@ -31,7 +28,6 @@ public class MonthYearPickerDialog extends DialogFragment{
         this.month = month;
         this.year = year;
     }
-
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {

@@ -1,42 +1,26 @@
-package com.unovikau.eventcalendar.data_model;
+package com.unovikau.eventcalendar.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import com.unovikau.eventcalendar.R;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
-
-import static android.content.ContentValues.TAG;
 
 public class EventPhotosAdapter extends PagerAdapter{
 
     private Context mContext;
     private LayoutInflater layoutInflater;
     private List<String> images;
-
-    /*
-    int[] mResources = {
-            R.drawable.img1,
-            R.drawable.img2
-    };*/
 
     public EventPhotosAdapter(Context mContext, List<String> images) {
         this.mContext = mContext;
@@ -72,10 +56,10 @@ public class EventPhotosAdapter extends PagerAdapter{
         container.removeView((View) object);
     }
 
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
+    private static class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        private ImageView bmImage;
 
-        public DownloadImageTask(ImageView bmImage) {
+        private DownloadImageTask(ImageView bmImage) {
             this.bmImage = bmImage;
         }
 

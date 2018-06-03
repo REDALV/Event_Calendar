@@ -1,12 +1,10 @@
 package com.unovikau.eventcalendar.fragments;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,26 +12,19 @@ import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.unovikau.eventcalendar.MonthYearPickerDialog;
+import com.unovikau.eventcalendar.dialogs.MonthYearPickerDialog;
 import com.unovikau.eventcalendar.R;
-import com.unovikau.eventcalendar.data_model.Event;
-import com.unovikau.eventcalendar.data_model.EventListAdapter;
+import com.unovikau.eventcalendar.models.Event;
+import com.unovikau.eventcalendar.adapters.EventListAdapter;
 
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
-
-import static android.content.ContentValues.TAG;
 
 public class EventListFragment extends Fragment {
 
@@ -81,12 +72,6 @@ public class EventListFragment extends Fragment {
 
 
         if(this.selectedDate == null){
-            /*
-            // Set current month and year
-            months = getResources().getStringArray(R.array.months_ru);
-            Calendar cal = Calendar.getInstance();
-            year = cal.get(Calendar.YEAR);
-            month = cal.get(Calendar.MONTH);*/
             current_month_tv.setText(months[month] + " " + year);
         }
         else {
@@ -96,6 +81,8 @@ public class EventListFragment extends Fragment {
         String jsonEvents = getArguments().getString("events");
         Gson gson = new Gson();
         this.eventList = gson.fromJson(jsonEvents, new TypeToken<List<Event>>(){}.getType());
+
+        Collections.sort(this.eventList, new DateComparator());
 
         adapter = new EventListAdapter(eventList,getActivity());
 
@@ -138,7 +125,9 @@ public class EventListFragment extends Fragment {
                         year = selected_year;
                         month = selected_month;
                         current_month_tv.setText(months[selected_month] + " " + selected_year);
+                        adapter.removeFilter();
                         adapter.getFilter().filter(String.valueOf(month + 1) + "." + String.valueOf(year));
+
                     }
                 });
                 pd.show(getFragmentManager(), "MonthYearPickerDialog");
@@ -163,5 +152,29 @@ public class EventListFragment extends Fragment {
             year = savedInstanceState.getInt("year");
         }
 
+    }
+
+    class DateComparator implements Comparator<Event> {
+
+
+        @Override
+        public int compare(Event o1, Event o2) {
+            Date firstDate = o1.getDate();
+            Date secondDate = o2.getDate();
+            Date today = new Date();
+
+            if(firstDate.equals(secondDate))
+                return 0;
+
+            if(firstDate.before(today) && secondDate.after(today))
+                return 1;
+            if(firstDate.after(today) && secondDate.before(today))
+                return -1;
+            if(firstDate.before(secondDate))
+                return 1;
+
+            return -1;
+
+        }
     }
 }

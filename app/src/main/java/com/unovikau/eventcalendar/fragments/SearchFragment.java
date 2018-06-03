@@ -16,8 +16,8 @@ import android.widget.ListView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.unovikau.eventcalendar.R;
-import com.unovikau.eventcalendar.data_model.Event;
-import com.unovikau.eventcalendar.data_model.EventListAdapter;
+import com.unovikau.eventcalendar.models.Event;
+import com.unovikau.eventcalendar.adapters.EventListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

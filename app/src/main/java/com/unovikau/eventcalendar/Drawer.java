@@ -2,11 +2,13 @@ package com.unovikau.eventcalendar;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -15,8 +17,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.content.Intent;
-import android.widget.AdapterView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,23 +24,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
-import com.unovikau.eventcalendar.data_model.Event;
-import com.unovikau.eventcalendar.data_model.EventListAdapter;
+import com.unovikau.eventcalendar.models.Event;
 import com.unovikau.eventcalendar.fragments.CalendarFragment;
-import com.unovikau.eventcalendar.fragments.EventDetailsFragment;
 import com.unovikau.eventcalendar.fragments.EventListFragment;
 import com.unovikau.eventcalendar.fragments.GMapFragment;
 import com.unovikau.eventcalendar.fragments.SearchFragment;
+import com.unovikau.eventcalendar.services.ReminderJobService;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
-
-import static android.content.ContentValues.TAG;
 
 public class Drawer extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -73,15 +68,48 @@ public class Drawer extends AppCompatActivity
 
         }
 
+        getDataFromFireBase();
+        scheduleJob();
+    }
+
+    private void scheduleJob(){
+        SharedPreferences preferences = PreferenceManager.
+                getDefaultSharedPreferences(this);
+
+        if(!preferences.getBoolean("firstRunComplete", false)){
+            //schedule the job only once.
+            scheduleReminderJob();
+
+            //update shared preference
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean("firstRunComplete", true);
+            editor.apply();
+        }
+
+    }
+
+    private void scheduleReminderJob(){
+        JobScheduler jobScheduler = (JobScheduler)getApplicationContext()
+                .getSystemService(JOB_SCHEDULER_SERVICE);
+
+        ComponentName componentName = new ComponentName(this,
+                ReminderJobService.class);
+
+        JobInfo jobInfo = new JobInfo.Builder(1, componentName)
+                .setPeriodic(36000000)
+                .setPersisted(true).build();
+
+        jobScheduler.schedule(jobInfo);
+    }
+
+    private void getDataFromFireBase(){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("events");
         myRef.keepSynced(true);
 
         eventList = new ArrayList<>();
 
-
         // Read from the database
-        /*myRef.addValueEventListener(new ValueEventListener() {*/
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -89,6 +117,7 @@ public class Drawer extends AppCompatActivity
                 // whenever data at this location is updated.
                 for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                     Event post = postSnapshot.getValue(Event.class);
+                    post.setId(postSnapshot.getKey());
                     eventList.add(post);
                 }
 
@@ -103,7 +132,6 @@ public class Drawer extends AppCompatActivity
                     FragmentManager fragmentManager = getFragmentManager();
                     fragmentManager.beginTransaction().replace(R.id.content_frame, eventListFragment).commit();
                 }
-
             }
 
             @Override
@@ -208,11 +236,7 @@ public class Drawer extends AppCompatActivity
         return true;
     }
 
-    private boolean isDateInTwoWeeks(String date){
-        //GregorianCalendar twoWeeksAfter = new GregorianCalendar();
-        //twoWeeksAfter.add(Calendar.DAY_OF_MONTH, 14);
-        //return !(date.before(new GregorianCalendar()) || date.after(twoWeeksAfter));
-
+    private static boolean isDateInTwoWeeks(String date){
         boolean result = false;
         try{
             SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");

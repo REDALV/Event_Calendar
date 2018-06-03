@@ -1,13 +1,11 @@
-package com.unovikau.eventcalendar.data_model;
+package com.unovikau.eventcalendar.adapters;
 
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v4.content.res.ResourcesCompat;
-import android.text.method.DateTimeKeyListener;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,15 +19,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.unovikau.eventcalendar.R;
 import com.unovikau.eventcalendar.fragments.GMapFragment;
+import com.unovikau.eventcalendar.models.Event;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 public class EventListAdapter extends BaseAdapter implements View.OnClickListener, Filterable{
@@ -131,6 +128,13 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
             result=convertView;
         }
 
+        if(dataModel.isPastEvent()){
+            convertView.setBackground(ResourcesCompat.getDrawable(mContext.getResources(), R.drawable.row_event_past_item_background, null));
+        }
+        else{
+            convertView.setBackground(ResourcesCompat.getDrawable(mContext.getResources(), R.drawable.row_event_item_background, null));
+        }
+
         Animation animation = AnimationUtils.loadAnimation(mContext, (position > lastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
         result.startAnimation(animation);
         lastPosition = position;
@@ -162,6 +166,8 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
             viewHolder.txtDate.setText(dataModel.getDateString());
         else
             viewHolder.txtDate.setText(dataModel.getDateString() + " - " + dataModel.getDateEndString());
+
+
 
         viewHolder.show_on_map.setOnClickListener(this);
         viewHolder.show_on_map.setTag(position);
@@ -209,7 +215,14 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
         return filter;
     }
 
+    public void removeFilter(){
+        filter = null;
+    }
 
+
+    /**
+     * Event list filter by month
+     */
     class MonthFilter extends Filter {
 
         @Override
@@ -226,12 +239,22 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
 
                 //get specific items
                 for (int i = 0; i < filterList.size(); i++) {
-                    String startDate = filterList.get(i).getDateString();
-                    String endDate = filterList.get(i).getDateString();
-
-                    if (startDate.contains(constraint) || endDate.contains(constraint)) {
-                        filters.add(filterList.get(i));
+                    if(filterList.get(i).getDateEnd() == null){
+                        String startDate = filterList.get(i).getDateString();
+                        if (startDate.contains(constraint)) {
+                            filters.add(filterList.get(i));
+                        }
                     }
+                    else{
+                        String startDate = filterList.get(i).getDateString();
+                        String endDate = filterList.get(i).getDateEndString();
+
+                        if (startDate.contains(constraint) || endDate.contains(constraint)) {
+                            filters.add(filterList.get(i));
+                        }
+                    }
+
+
                 }
 
                 results.count = filters.size();
@@ -246,6 +269,8 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
             return results;
         }
 
+
+
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             // TODO Auto-generated method stub
@@ -255,6 +280,9 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
         }
     }
 
+    /**
+     * Event list filter by date
+     */
     class DateFilter extends Filter
     {
 
@@ -275,17 +303,13 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
                     SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
                     Date selectedDate = sdf.parse(constraint.toString());
 
-
                     //get specific items
                     for(Event x: filterList)
                     {
-                        Date startDate = sdf.parse(x.getDateString());
-
-                        //boolean x1 = selected_date.before(startDate);
-                        //boolean x2 = selected_date.getTime().after(endDate.getTime());
+                        Date startDate = x.getDate();
 
                         if(x.getDateEnd() != null){
-                            Date endDate = sdf.parse(x.getDateEndString());
+                            Date endDate = x.getDateEnd();
                             if(!(selectedDate.before(startDate) || selectedDate.after(endDate)))
                                 filters.add(x);
                         }
@@ -321,6 +345,9 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
 
     }
 
+    /**
+     * Event list filter by name
+     */
     class NameFilter extends Filter
     {
         @Override

@@ -1,21 +1,25 @@
-package com.unovikau.eventcalendar.data_model;
+package com.unovikau.eventcalendar.models;
+
+import android.util.Log;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.GregorianCalendar;
+import java.util.Date;
 import java.util.List;
 
 @IgnoreExtraProperties
 public class Event {
 
+    private String id;
     private String name;
     private String article;
     private String address;
     private String time;
     private String timeEnd;
-    private GregorianCalendar date;
-    private GregorianCalendar dateEnd;
+    private Date date;
+    private Date dateEnd;
     private Boolean isImportant;
     private Double lat;
     private Double lng;
@@ -29,14 +33,23 @@ public class Event {
 
     public Event(String name, String article, String address, String time, String timeEnd, String date, String dateEnd,
                  Boolean isImportant, Double lat, Double lng, Long type, Long subtype, List<String> images) {
-        String[] array = date.split(".");
-        this.date = new GregorianCalendar(Integer.parseInt(array[2]), Integer.parseInt(array[1])-1, Integer.parseInt(array[0]));
 
-        array = dateEnd.split(".");
-        if (array.length == 3)
-            this.dateEnd = new GregorianCalendar(Integer.parseInt(array[2]), Integer.parseInt(array[1])-1, Integer.parseInt(array[0]));
-        else
-            this.dateEnd = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        try{
+            this.date = sdf.parse(date);
+        }
+        catch (ParseException e){
+            Log.e("date", e.getMessage());
+        }
+
+        if(dateEnd!=null && !dateEnd.equals("")){
+            try{
+                this.dateEnd = sdf.parse(dateEnd);
+            }
+            catch (ParseException e){
+                Log.e("dateEnd", e.getMessage());
+            }
+        }
 
         this.name = name;
         this.article = article;
@@ -55,6 +68,9 @@ public class Event {
     public String toString(){
        return name;
     }
+
+    public String getId() {  return id;  }
+    public void setId(String id) { this.id = id; }
 
     public String getName() {
         return name;
@@ -96,25 +112,32 @@ public class Event {
         this.timeEnd = timeEnd;
     }
 
-    public GregorianCalendar getDate() {
+    public Date getDate() {
         return date;
     }
 
     public void setDate(String date) {
-        String[] array = date.split("\\.");
-        this.date = new GregorianCalendar(Integer.parseInt(array[2]), Integer.parseInt(array[1])-1, Integer.parseInt(array[0]));
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        try{
+            this.date = sdf.parse(date);
+        }
+        catch (ParseException e){
+            Log.e("date", e.getMessage());
+        }
     }
 
-    public GregorianCalendar getDateEnd() {
+    public Date getDateEnd() {
         return dateEnd;
     }
 
     public void setDateEnd(String dateEnd) {
-        String[] array = dateEnd.split("\\.");
-        if(array.length == 3)
-            this.dateEnd = new GregorianCalendar(Integer.parseInt(array[2]), Integer.parseInt(array[1])-1, Integer.parseInt(array[0]));
-        else
-            this.dateEnd = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        try{
+            this.dateEnd = sdf.parse(dateEnd);
+        }
+        catch (ParseException e){
+            Log.e("date", e.getMessage());
+        }
     }
 
     public Long getSubtype() {
@@ -167,13 +190,25 @@ public class Event {
 
     public String getDateString() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy");
-        simpleDateFormat.setCalendar(this.date);
         return simpleDateFormat.format(this.date.getTime());
     }
 
     public String getDateEndString() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy");
-        simpleDateFormat.setCalendar(this.dateEnd);
         return simpleDateFormat.format(this.dateEnd.getTime());
+    }
+
+    public boolean isPastEvent(){
+        boolean result = false;
+
+        Date today = new Date();
+        if(this.dateEnd == null){
+            result = this.date.before(today);
+        }
+        else{
+            result =  this.date.before(today) && this.dateEnd.before(today);
+        }
+
+        return result;
     }
 }

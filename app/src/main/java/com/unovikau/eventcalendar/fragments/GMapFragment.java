@@ -24,7 +24,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.unovikau.eventcalendar.R;
-import com.unovikau.eventcalendar.data_model.Event;
+import com.unovikau.eventcalendar.models.Event;
 
 import java.util.List;
 
@@ -34,8 +34,6 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback,
     private GoogleMap mGoogleMap;
     private Event event;
     private List<Event> eventsInTwoWeeks;
-
-    private FusedLocationProviderClient mFusedLocationClient;
 
 
     @Nullable
@@ -48,13 +46,10 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback,
                 this.event = gson.fromJson(jsonEvent, Event.class);
             }
 
-
             Gson gson = new Gson();
             String jsonEvents = getArguments().getString("eventsInTwoWeeks");
             this.eventsInTwoWeeks = gson.fromJson(jsonEvents, new TypeToken<List<Event>>(){}.getType());
         }
-
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
         return inflater.inflate(R.layout.fragment_gmap, container, false);
     }
@@ -85,10 +80,6 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback,
                 googleMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
             }
             else{
-                //LatLng latLng = new LatLng(this.event.getLat(), this.event.getLng());
-                //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));
-                // Zoom in, animating the camera.
-
                 for (Event x: eventsInTwoWeeks) {
                     LatLng latLng = new LatLng(x.getLat(), x.getLng());
                     if(x.getDateEnd() != null){
