@@ -31,3 +31,4 @@ public interface RemindersDAO {
     @Query("SELECT * FROM eventReminder")
     public List<EventReminder> getReminders();
 }
+

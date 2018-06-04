@@ -21,7 +21,7 @@ import com.google.gson.reflect.TypeToken;
 import com.unovikau.eventcalendar.dialogs.MonthYearPickerDialog;
 import com.unovikau.eventcalendar.R;
 import com.unovikau.eventcalendar.dialogs.TypePickerDialog;
-import com.unovikau.eventcalendar.models.Event;
+import com.unovikau.eventcalendar.models.CityEvent;
 import com.unovikau.eventcalendar.adapters.EventListAdapter;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ import java.util.List;
 public class EventListFragment extends Fragment {
 
     String[] months;
-    List<Event> eventList;
+    List<CityEvent> eventList;
     private static EventListAdapter adapter;
     int year;
     int month;
@@ -86,7 +86,7 @@ public class EventListFragment extends Fragment {
 
         String jsonEvents = getArguments().getString("events");
         Gson gson = new Gson();
-        this.eventList = gson.fromJson(jsonEvents, new TypeToken<List<Event>>(){}.getType());
+        this.eventList = gson.fromJson(jsonEvents, new TypeToken<List<CityEvent>>(){}.getType());
 
         this.eventList = sortEventList(this.eventList);
 
@@ -104,7 +104,7 @@ public class EventListFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Event dataModel = (Event) listView.getAdapter().getItem(position);
+                CityEvent dataModel = (CityEvent) listView.getAdapter().getItem(position);
                 Gson gson = new Gson();
                 String json = gson.toJson(dataModel);
 
@@ -186,12 +186,12 @@ public class EventListFragment extends Fragment {
 
     }
 
-    private List<Event> sortEventList(List<Event> eventList){
+    private List<CityEvent> sortEventList(List<CityEvent> eventList){
 
-        List<Event> pastEvents = new ArrayList<Event>();
-        List<Event> activeEvents = new ArrayList<Event>();
+        List<CityEvent> pastEvents = new ArrayList<CityEvent>();
+        List<CityEvent> activeEvents = new ArrayList<CityEvent>();
 
-        for (Event event: eventList) {
+        for (CityEvent event: eventList) {
             if(event.isPastEvent())
                 pastEvents.add(event);
             else{
@@ -206,11 +206,11 @@ public class EventListFragment extends Fragment {
         return  activeEvents;
     }
 
-    class DateComparator implements Comparator<Event> {
+    class DateComparator implements Comparator<CityEvent> {
 
 
         @Override
-        public int compare(Event o1, Event o2) {
+        public int compare(CityEvent o1, CityEvent o2) {
             Date firstDate = o1.getDate();
             Date secondDate = o2.getDate();
 

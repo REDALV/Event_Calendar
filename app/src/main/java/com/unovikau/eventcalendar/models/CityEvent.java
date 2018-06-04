@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Locale;
 
 @IgnoreExtraProperties
-public class Event {
+public class CityEvent {
 
     private String id;
     private String name;
@@ -28,12 +28,12 @@ public class Event {
     private Long subtype;
     private List<String> images;
 
-    public Event() {
+    public CityEvent() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Event(String name, String article, String address, String time, String timeEnd, String date, String dateEnd,
-                 Boolean isImportant, Double lat, Double lng, Long type, Long subtype, List<String> images) {
+    public CityEvent(String name, String article, String address, String time, String timeEnd, String date, String dateEnd,
+                     Boolean isImportant, Double lat, Double lng, Long type, Long subtype, List<String> images) {
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
         try{

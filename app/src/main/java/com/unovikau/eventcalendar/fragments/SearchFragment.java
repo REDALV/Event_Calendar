@@ -16,7 +16,7 @@ import android.widget.ListView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.unovikau.eventcalendar.R;
-import com.unovikau.eventcalendar.models.Event;
+import com.unovikau.eventcalendar.models.CityEvent;
 import com.unovikau.eventcalendar.adapters.EventListAdapter;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import java.util.List;
 
 public class SearchFragment extends Fragment {
 
-    private List<Event> eventList;
+    private List<CityEvent> eventList;
     private ListView listView;
     private EventListAdapter adapter;
     EditText inputSearch;
@@ -47,7 +47,7 @@ public class SearchFragment extends Fragment {
 
         String jsonEvents = getArguments().getString("events");
         Gson gson = new Gson();
-        this.eventList = gson.fromJson(jsonEvents, new TypeToken<List<Event>>(){}.getType());
+        this.eventList = gson.fromJson(jsonEvents, new TypeToken<List<CityEvent>>(){}.getType());
 
         adapter = new EventListAdapter(eventList,getActivity());
 
@@ -57,7 +57,7 @@ public class SearchFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Event dataModel = (Event) listView.getAdapter().getItem(position);
+                CityEvent dataModel = (CityEvent) listView.getAdapter().getItem(position);
                 Gson gson = new Gson();
                 String json = gson.toJson(dataModel);
 

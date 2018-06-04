@@ -9,3 +9,4 @@ import com.unovikau.eventcalendar.models.EventReminder;
 public abstract class RemindersDB extends RoomDatabase {
     public abstract RemindersDAO RemindersDb();
 }
+

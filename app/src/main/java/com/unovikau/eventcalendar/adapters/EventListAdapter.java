@@ -21,7 +21,7 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.unovikau.eventcalendar.R;
 import com.unovikau.eventcalendar.fragments.GMapFragment;
-import com.unovikau.eventcalendar.models.Event;
+import com.unovikau.eventcalendar.models.CityEvent;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,11 +30,11 @@ import java.util.Date;
 import java.util.List;
 
 public class EventListAdapter extends BaseAdapter implements View.OnClickListener, Filterable{
-    private List<Event> dataSet;
+    private List<CityEvent> dataSet;
 
     Filter filter;
     Context mContext;
-    private List<Event> filterList;
+    private List<CityEvent> filterList;
 
     private static final String TAG = "EventListAdapter";
 
@@ -47,7 +47,7 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
         ImageView show_on_map;
     }
 
-    public EventListAdapter(List<Event> data, Context context) {
+    public EventListAdapter(List<CityEvent> data, Context context) {
         //super(context, R.layout.row_event_item, data);
         this.dataSet = data;
         this.filterList = data;
@@ -59,7 +59,7 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
 
         int position=(Integer) v.getTag();
         Object object= getItem(position);
-        Event dataModel=(Event)object;
+        CityEvent dataModel=(CityEvent)object;
 
         switch (v.getId())
         {
@@ -105,7 +105,7 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
-        Event dataModel = (Event)getItem(position);
+        CityEvent dataModel = (CityEvent)getItem(position);
         // Check if an existing view is being reused, otherwise inflate the view
         ViewHolder viewHolder; // view lookup cache stored in tag
 
@@ -222,7 +222,7 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
 
 
     /**
-     * Event list filter by month
+     * CityEvent list filter by month
      */
     class MonthFilter extends Filter {
 
@@ -241,7 +241,7 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
 
                 constraint = args[0];
 
-                ArrayList<Event> filters = new ArrayList<Event>();
+                ArrayList<CityEvent> filters = new ArrayList<CityEvent>();
 
                 //get specific items
                 for (int i = 0; i < filterList.size(); i++) {
@@ -291,13 +291,13 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
         protected void publishResults(CharSequence constraint, FilterResults results) {
             // TODO Auto-generated method stub
 
-            dataSet = (ArrayList<Event>) results.values;
+            dataSet = (ArrayList<CityEvent>) results.values;
             notifyDataSetChanged();
         }
     }
 
     /**
-     * Event list filter by date
+     * CityEvent list filter by date
      */
     class DateFilter extends Filter
     {
@@ -317,7 +317,7 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
             {
                 String constr = constraint.toString();
                 String[] values = constr.split("\\.");
-                List<Event> filters=new ArrayList<Event>();
+                List<CityEvent> filters=new ArrayList<CityEvent>();
 
                 //GregorianCalendar selected_date = new GregorianCalendar(Integer.parseInt(values[2]),Integer.parseInt(values[1]),Integer.parseInt(values[0]));
                 try{
@@ -325,7 +325,7 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
                     Date selectedDate = sdf.parse(constraint.toString());
 
                     //get specific items
-                    for(Event x: filterList)
+                    for(CityEvent x: filterList)
                     {
                         Date startDate = x.getDate();
 
@@ -370,14 +370,14 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
 
-            dataSet=(ArrayList<Event>) results.values;
+            dataSet=(ArrayList<CityEvent>) results.values;
             notifyDataSetChanged();
         }
 
     }
 
     /**
-     * Event list filter by name
+     * CityEvent list filter by name
      */
     class NameFilter extends Filter
     {
@@ -392,7 +392,7 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
                 //CONSTARINT TO UPPER
                 constraint=constraint.toString().toUpperCase();
 
-                List<Event> filters=new ArrayList<Event>();
+                List<CityEvent> filters=new ArrayList<CityEvent>();
 
                 //get specific items
                 for(int i=0;i<filterList.size();i++)
@@ -420,7 +420,7 @@ public class EventListAdapter extends BaseAdapter implements View.OnClickListene
         protected void publishResults(CharSequence constraint, FilterResults results) {
             // TODO Auto-generated method stub
 
-            dataSet=(ArrayList<Event>) results.values;
+            dataSet=(ArrayList<CityEvent>) results.values;
             notifyDataSetChanged();
         }
 

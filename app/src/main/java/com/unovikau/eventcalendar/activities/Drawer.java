@@ -1,4 +1,4 @@
-package com.unovikau.eventcalendar;
+package com.unovikau.eventcalendar.activities;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -28,7 +28,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
-import com.unovikau.eventcalendar.models.Event;
+import com.unovikau.eventcalendar.R;
+import com.unovikau.eventcalendar.models.CityEvent;
 import com.unovikau.eventcalendar.fragments.CalendarFragment;
 import com.unovikau.eventcalendar.fragments.EventListFragment;
 import com.unovikau.eventcalendar.fragments.GMapFragment;
@@ -44,7 +45,7 @@ import java.util.List;
 public class Drawer extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    List<Event> eventList;
+    List<CityEvent> eventList;
 
     Fragment eventListFragment;
     private static final String TAG = "Drawer";
@@ -134,7 +135,7 @@ public class Drawer extends AppCompatActivity
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
                 for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-                    Event post = postSnapshot.getValue(Event.class);
+                    CityEvent post = postSnapshot.getValue(CityEvent.class);
                     post.setId(postSnapshot.getKey());
                     eventList.add(post);
                 }
@@ -225,7 +226,7 @@ public class Drawer extends AppCompatActivity
 
             //fragmentManager.beginTransaction().replace(R.id.content_frame, new CalendarFragment()).addToBackStack("calendar").commit();
         } else if (id == R.id.nav_map) {
-            List<Event> eventsInTwoWeeks = getEventsInTwoWeeks();
+            List<CityEvent> eventsInTwoWeeks = getEventsInTwoWeeks();
 
             String eventsJson = gson.toJson(eventsInTwoWeeks);
             Bundle bundleGMap = new Bundle();
@@ -273,9 +274,9 @@ public class Drawer extends AppCompatActivity
         return result;
     }
 
-    private List<Event> getEventsInTwoWeeks(){
-        List<Event> resultEvents = new ArrayList<>(0);
-        for (Event x: eventList) {
+    private List<CityEvent> getEventsInTwoWeeks(){
+        List<CityEvent> resultEvents = new ArrayList<>(0);
+        for (CityEvent x: eventList) {
             if(x.getDateEnd() != null){
                 if(isDateInTwoWeeks(x.getDateString()) || isDateInTwoWeeks(x.getDateEndString()))
                     resultEvents.add(x);

@@ -12,8 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -24,7 +22,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.unovikau.eventcalendar.R;
-import com.unovikau.eventcalendar.models.Event;
+import com.unovikau.eventcalendar.models.CityEvent;
 
 import java.util.List;
 
@@ -32,8 +30,8 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback,
         GoogleMap.OnInfoWindowClickListener {
 
     private GoogleMap mGoogleMap;
-    private Event event;
-    private List<Event> eventsInTwoWeeks;
+    private CityEvent event;
+    private List<CityEvent> eventsInTwoWeeks;
 
 
     @Nullable
@@ -43,12 +41,12 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback,
             if(getArguments().getString("event") != null){
                 String jsonEvent = getArguments().getString("event");
                 Gson gson = new Gson();
-                this.event = gson.fromJson(jsonEvent, Event.class);
+                this.event = gson.fromJson(jsonEvent, CityEvent.class);
             }
 
             Gson gson = new Gson();
             String jsonEvents = getArguments().getString("eventsInTwoWeeks");
-            this.eventsInTwoWeeks = gson.fromJson(jsonEvents, new TypeToken<List<Event>>(){}.getType());
+            this.eventsInTwoWeeks = gson.fromJson(jsonEvents, new TypeToken<List<CityEvent>>(){}.getType());
         }
 
         return inflater.inflate(R.layout.fragment_gmap, container, false);
@@ -81,7 +79,7 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback,
             mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
         }
         else{
-            for (Event x: eventsInTwoWeeks) {
+            for (CityEvent x: eventsInTwoWeeks) {
                 LatLng latLng = new LatLng(x.getLat(), x.getLng());
                 if(x.getDateEnd() != null){
                     mGoogleMap.addMarker(new MarkerOptions().position(latLng)
@@ -103,7 +101,7 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        Event dataModel = (Event) marker.getTag();
+        CityEvent dataModel = (CityEvent) marker.getTag();
         Gson gson = new Gson();
         String json = gson.toJson(dataModel);
 

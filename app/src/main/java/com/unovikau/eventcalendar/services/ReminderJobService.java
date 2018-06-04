@@ -13,6 +13,7 @@ import com.unovikau.eventcalendar.room.RemindersDB;
 import com.unovikau.eventcalendar.R;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -22,10 +23,14 @@ public class ReminderJobService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
         RemindersDB remindersDB = Room.databaseBuilder(this,RemindersDB.class, "reminders db").allowMainThreadQueries().build();
-        Date today = new Date();
+
+        final Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -1);
+        Date yesterday = cal.getTime();
+
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 
-        List<EventReminder> reminderList = remindersDB.RemindersDb().getRemindersOnDate(sdf.format(today));
+        List<EventReminder> reminderList = remindersDB.RemindersDb().getRemindersOnDate(sdf.format(yesterday));
 
         if(reminderList.size()>0){
             for (EventReminder reminder: reminderList) {
@@ -34,7 +39,7 @@ public class ReminderJobService extends JobService {
                                 R.mipmap.ic_launcher))
                         .setSmallIcon(R.drawable.ic_events_list)
                         .setContentTitle(reminder.getEventName())
-                        .setContentText(reminder.getEventDate())
+                        .setContentText(reminder.getEventAddress() + ", " + reminder.getEventTime())
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);

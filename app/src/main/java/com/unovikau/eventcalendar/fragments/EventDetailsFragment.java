@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.unovikau.eventcalendar.R;
-import com.unovikau.eventcalendar.models.Event;
+import com.unovikau.eventcalendar.models.CityEvent;
 import com.unovikau.eventcalendar.adapters.EventPhotosAdapter;
 import com.unovikau.eventcalendar.models.EventReminder;
 import com.unovikau.eventcalendar.room.RemindersDB;
@@ -30,7 +30,7 @@ public class EventDetailsFragment extends Fragment {
     ViewPager eventPhotos;
     Button reminderButton;
 
-    private Event event;
+    private CityEvent event;
 
     private RemindersDB remindersDB;
     int remindersCount;
@@ -58,7 +58,7 @@ public class EventDetailsFragment extends Fragment {
         if(getArguments() != null){
             String jsonEvent = getArguments().getString("event");
             Gson gson = new Gson();
-            this.event = gson.fromJson(jsonEvent, Event.class);
+            this.event = gson.fromJson(jsonEvent, CityEvent.class);
 
             this.eventName.setText(this.event.getName());
             if(this.event.getDateEnd() == null)
@@ -93,9 +93,9 @@ public class EventDetailsFragment extends Fragment {
                         remindersCount = 0;
                     }
                     else{
-                        remindersDB.RemindersDb().insertReminder(new EventReminder(event.getId(),event.getName(), event.getDateString()));
+                        remindersDB.RemindersDb().insertReminder(new EventReminder(event.getId(),event.getName(), event.getDateString(), event.getTime(), event.getAddress()));
                         Toast.makeText(getActivity(),
-                                "В день начала события вам придет напоминание", Toast.LENGTH_SHORT).show();
+                                "За день до начала события вам придет напоминание", Toast.LENGTH_SHORT).show();
                         remindersCount = 1;
                     }
 
